@@ -78,6 +78,15 @@ namespace LibGit2Sharp.Core
         public bool Binary;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    internal class GitDiffRange
+    {
+        public int OldStart;
+        public int OldLines;
+        public int NewStart;
+        public int NewLines;
+    }
+
     enum GitDiffLineOrigin : byte
     {
         GIT_DIFF_LINE_CONTEXT = 0x20, //' ',
