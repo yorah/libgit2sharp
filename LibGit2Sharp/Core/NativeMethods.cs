@@ -166,6 +166,82 @@ namespace LibGit2Sharp.Core
             [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string value);
 
         [DllImport(libgit2)]
+        public static extern void git_diff_list_free(IntPtr diff);
+
+        [DllImport(libgit2)]
+        public static extern int git_diff_tree_to_tree(
+            RepositorySafeHandle repo,
+            GitDiffOptions options,
+            IntPtr oldTree,
+            IntPtr newTree,
+            out IntPtr diff);
+
+        [DllImport(libgit2)]
+        public static extern int git_diff_index_to_tree(
+            RepositorySafeHandle repo,
+            GitDiffOptions options,
+            IntPtr oldTree,
+            out IntPtr diff);
+
+        [DllImport(libgit2)]
+        public static extern int git_diff_workdir_to_index(
+            RepositorySafeHandle repo,
+            GitDiffOptions options,
+            out IntPtr diff);
+
+        [DllImport(libgit2)]
+        public static extern int git_diff_workdir_to_tree(
+            RepositorySafeHandle repo,
+            GitDiffOptions options,
+            IntPtr oldTree,
+            out IntPtr diff);
+
+        [DllImport(libgit2)]
+        public static extern int git_diff_merge(IntPtr onto, IntPtr from);
+
+        internal delegate int git_diff_file_fn(object data, GitDiffDelta delta, float progress);
+
+        internal delegate int git_diff_hunk_fn(
+            object data, 
+            GitDiffDelta delta, 
+            GitDiffRange range, 
+            [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string header,
+            int headerLen);
+
+        internal delegate int git_diff_line_fn(
+            object data,
+            GitDiffDelta delta,
+            GitDiffLineOrigin lineOrigin,
+            IntPtr content,
+            int contentLen);
+
+        [DllImport(libgit2)]
+        public static extern int git_diff_foreach(
+            IntPtr diff,
+            object callbackData,
+            git_diff_file_fn fileCallback,
+            git_diff_hunk_fn hunkCallback,
+            git_diff_line_fn lineCallback);
+
+        internal delegate int git_diff_output_fn(
+            object data,
+            GitDiffLineOrigin lineOrigin,
+            [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string formattedOutput);
+
+        [DllImport(libgit2)]
+        public static extern int git_diff_print_patch(IntPtr diff, object data, git_diff_output_fn printCallback);
+
+        [DllImport(libgit2)]
+        public static extern int git_diff_blobs(
+            RepositorySafeHandle repository,
+            IntPtr oldBlob,
+            IntPtr newBlob,
+            GitDiffOptions options,
+            object data,
+            git_diff_hunk_fn hunkCallback,
+            git_diff_line_fn lineCallback);
+
+        [DllImport(libgit2)]
         public static extern int git_index_add(
             IndexSafeHandle index,
             [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(FilePathMarshaler))] FilePath path,
