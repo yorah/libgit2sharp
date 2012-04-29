@@ -137,5 +137,23 @@ namespace LibGit2Sharp
 
             Ensure.Success(res);
         }
+
+        public Note Edit(string message, Signature author, Signature committer, string @namespace)
+        {
+            Ensure.ArgumentNotNullOrEmptyString(message, "message");
+            Ensure.ArgumentNotNull(author, "author");
+            Ensure.ArgumentNotNull(committer, "committer");
+            Ensure.ArgumentNotNullOrEmptyString(@namespace, "@namespace");
+
+            string canonicalName = NormalizeToCanonicalName(@namespace);
+
+            GitOid noteOid;
+            GitOid oid = commitOid.Oid;
+
+            Ensure.Success(NativeMethods.git_note_remove(repo.Handle, canonicalName, author.BuildHandle(), committer.BuildHandle(), ref oid));
+            Ensure.Success(NativeMethods.git_note_create(out noteOid, repo.Handle, author.BuildHandle(), committer.BuildHandle(), canonicalName, ref oid, message));
+
+            return this[canonicalName];
+        }
     }
 }

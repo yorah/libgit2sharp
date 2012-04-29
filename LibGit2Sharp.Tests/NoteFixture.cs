@@ -14,7 +14,7 @@ namespace LibGit2Sharp.Tests
         //* add a note on a commit
         //* add a note with a namespace on a commit
         //* delete a note from a commit
-        //- modify a note
+        //* modify a note
 
         // TODO we might want to order the notes with the author signature date. If yes, this info should be returned by libgit2?
 
@@ -226,6 +226,20 @@ namespace LibGit2Sharp.Tests
                 var commit = repo.Lookup<Commit>("5b5b025afb0b4c913b4c338a42934a3863bf3644");
 
                 commit.Notes.Delete("answer2", signatureNullToken, signatureYorah);
+            }
+        }
+
+        [Fact]
+        public void CanEditANoteOnACommitByPassingItsNamespace()
+        {
+            TemporaryCloneOfTestRepo path = BuildTemporaryCloneOfTestRepo();
+            using (var repo = new Repository(path.RepositoryPath))
+            {
+                var commit = repo.Lookup<Commit>("5b5b025afb0b4c913b4c338a42934a3863bf3644");
+
+                var note = commit.Notes.Edit("I'm a new note!", signatureNullToken, signatureYorah, "answer");
+
+                Assert.Equal(note, commit.Notes["answer"]);
             }
         }
     }
