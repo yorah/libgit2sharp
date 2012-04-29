@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using LibGit2Sharp.Core;
 using LibGit2Sharp.Tests.TestHelpers;
 using Xunit;
 
@@ -9,12 +11,15 @@ namespace LibGit2Sharp.Tests
         //* get default note from commit
         //* get all notes (all namespaces, equivalent to --show-notes=*)
         //* indexer with namespace
-        //- add a note on a commit
-        //- add a note with a namespace on a commit
+        //* add a note on a commit
+        //* add a note with a namespace on a commit
         //- delete a note from a commit
         //- modify a note
 
         // TODO we might want to order the notes with the author signature date. If yes, this info should be returned by libgit2?
+
+        private static readonly Signature signatureNullToken = new Signature("nulltoken", "emeric.fermas@gmail.com", DateTimeOffset.UtcNow);
+        private static readonly Signature signatureYorah = new Signature("yorah", "yoram.harmelin@gmail.com", Epoch.ToDateTimeOffset(1300557894, 60));
 
         /*
          * $ git log 8496071c1b46c854b31185ea97743be6a8774479
@@ -119,6 +124,42 @@ namespace LibGit2Sharp.Tests
                 var commit = repo.Lookup<Commit>("4a202b346bb0fb0db7eff3cffeb3c70babbd2045");
 
                 Assert.Equal(expectedNotes, commit.Notes.Select(n => n.Message).ToArray());
+            }
+        }
+
+        [Fact]
+        public void CanAddADefaultNoteOnACommit()
+        {
+            TemporaryCloneOfTestRepo path = BuildTemporaryCloneOfTestRepo();
+            using (var repo = new Repository(path.RepositoryPath))
+            {
+                var commit = repo.Lookup<Commit>("9fd738e8f7967c078dceed8190330fc8648ee56a");
+
+                var note = commit.Notes.Add("woot!\n", signatureNullToken, signatureYorah);
+
+                var defaultNote = commit.Notes.Default;
+                Assert.Equal(note, defaultNote);
+
+                Assert.Equal("woot!\n", defaultNote.Message);
+                Assert.Equal("commits", defaultNote.Namespace);
+            }
+        }
+
+        [Fact]
+        public void CanAddANoteWithACustomNamespaceOnACommit()
+        {
+            TemporaryCloneOfTestRepo path = BuildTemporaryCloneOfTestRepo();
+            using (var repo = new Repository(path.RepositoryPath))
+            {
+                var commit = repo.Lookup<Commit>("9fd738e8f7967c078dceed8190330fc8648ee56a");
+
+                var note = commit.Notes.Add("I'm batman!\n", signatureNullToken, signatureYorah, "batmobile");
+                
+                var batmobileNote = commit.Notes["batmobile"];
+                Assert.Equal(note, batmobileNote);
+
+                Assert.Equal("I'm batman!\n", batmobileNote.Message);
+                Assert.Equal("batmobile", batmobileNote.Namespace);
             }
         }
     }

@@ -92,5 +92,27 @@ namespace LibGit2Sharp
 
             return name.Substring(refsNotesPrefix.Length);
         }
+
+        public Note Add(string message, Signature author, Signature committer)
+        {
+            return Add(message, author, committer, defaultRefsNotesNamespace);
+        }
+
+        public Note Add(string message, Signature author, Signature committer, string @namespace)
+        {
+            Ensure.ArgumentNotNullOrEmptyString(message, "message");
+            Ensure.ArgumentNotNull(author, "author");
+            Ensure.ArgumentNotNull(committer, "committer");
+            Ensure.ArgumentNotNullOrEmptyString(@namespace, "@namespace");
+
+            string canonicalName = NormalizeToCanonicalName(@namespace);
+
+            GitOid noteOid;
+            GitOid oid = commitOid.Oid;
+
+            Ensure.Success(NativeMethods.git_note_create(out noteOid, repo.Handle, author.BuildHandle(), committer.BuildHandle(), canonicalName, ref oid, message));
+
+            return this[canonicalName];
+        }
     }
 }
