@@ -114,5 +114,28 @@ namespace LibGit2Sharp
 
             return this[canonicalName];
         }
+
+
+        public void Delete(Signature author, Signature committer)
+        {
+            Delete(defaultRefsNotesNamespace, author, committer);
+        }
+
+        public void Delete(string @namespace, Signature author, Signature committer)
+        {
+            Ensure.ArgumentNotNull(author, "author");
+            Ensure.ArgumentNotNull(committer, "committer");
+            Ensure.ArgumentNotNullOrEmptyString(@namespace, "@namespace");
+
+            GitOid oid = commitOid.Oid;
+            var res = NativeMethods.git_note_remove(repo.Handle, NormalizeToCanonicalName(@namespace), author.BuildHandle(), committer.BuildHandle(), ref oid);
+
+            if (res == (int)GitErrorCode.GIT_ENOTFOUND)
+            {
+                return;
+            }
+
+            Ensure.Success(res);
+        }
     }
 }

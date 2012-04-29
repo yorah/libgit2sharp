@@ -13,7 +13,7 @@ namespace LibGit2Sharp.Tests
         //* indexer with namespace
         //* add a note on a commit
         //* add a note with a namespace on a commit
-        //- delete a note from a commit
+        //* delete a note from a commit
         //- modify a note
 
         // TODO we might want to order the notes with the author signature date. If yes, this info should be returned by libgit2?
@@ -160,6 +160,72 @@ namespace LibGit2Sharp.Tests
 
                 Assert.Equal("I'm batman!\n", batmobileNote.Message);
                 Assert.Equal("batmobile", batmobileNote.Namespace);
+            }
+        }
+
+        /*
+         * $ git log 8496071c1b46c854b31185ea97743be6a8774479
+         * commit 8496071c1b46c854b31185ea97743be6a8774479
+         * Author: Scott Chacon <schacon@gmail.com>
+         * Date:   Sat May 8 16:13:06 2010 -0700
+         *
+         *     testing
+         *
+         * Notes:
+         *     Hi, I'm Note.
+         */
+        [Fact]
+        public void CanRemoveANoteWithTheDefaultNamespaceOnACommit()
+        {
+            TemporaryCloneOfTestRepo path = BuildTemporaryCloneOfTestRepo();
+            using (var repo = new Repository(path.RepositoryPath))
+            {
+                var commit = repo.Lookup<Commit>("8496071c1b46c854b31185ea97743be6a8774479");
+
+                Assert.NotNull(commit.Notes.Default);
+
+                commit.Notes.Delete(signatureNullToken, signatureYorah);
+
+                Assert.Null(commit.Notes.Default);
+            }
+        }
+
+        /*
+         * $ git show 5b5b025afb0b4c913b4c338a42934a3863bf3644 --notes=answer
+         * commit 5b5b025afb0b4c913b4c338a42934a3863bf3644
+         * Author: Scott Chacon <schacon@gmail.com>
+         * Date:   Tue May 11 13:38:42 2010 -0700
+         * 
+         *     another commit
+         * 
+         * Notes (answer):
+         *     Not what?
+         */
+        [Fact]
+        public void CanRemoveANoteOnACommitByPassingItsNamespace()
+        {
+            TemporaryCloneOfTestRepo path = BuildTemporaryCloneOfTestRepo();
+            using (var repo = new Repository(path.RepositoryPath))
+            {
+                var commit = repo.Lookup<Commit>("5b5b025afb0b4c913b4c338a42934a3863bf3644");
+
+                Assert.NotNull(commit.Notes["answer"]);
+
+                commit.Notes.Delete("answer", signatureNullToken, signatureYorah);
+
+                Assert.Null(commit.Notes["answer"]);
+            }
+        }
+
+        [Fact]
+        public void RemovingANonExistingNoteDoesntThrow()
+        {
+            TemporaryCloneOfTestRepo path = BuildTemporaryCloneOfTestRepo();
+            using (var repo = new Repository(path.RepositoryPath))
+            {
+                var commit = repo.Lookup<Commit>("5b5b025afb0b4c913b4c338a42934a3863bf3644");
+
+                commit.Notes.Delete("answer2", signatureNullToken, signatureYorah);
             }
         }
     }
