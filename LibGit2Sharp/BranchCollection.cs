@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using LibGit2Sharp.Core;
 using LibGit2Sharp.Core.Handles;
 
@@ -188,6 +189,18 @@ namespace LibGit2Sharp
             }
 
             return this[newName];
+        }
+
+        public virtual Branch Update(Branch branch, params Action<BranchPropsUpdater>[] actions)
+        {
+            var updater = new BranchPropsUpdater(repo, branch);
+
+            foreach (Action<BranchPropsUpdater> action in actions)
+            {
+                action(updater);
+            }
+
+            return this[branch.Name];
         }
 
         private static bool LooksLikeABranchName(string referenceName)

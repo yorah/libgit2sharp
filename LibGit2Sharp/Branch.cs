@@ -206,51 +206,6 @@ namespace LibGit2Sharp
             repo.Checkout(this, checkoutOptions, onCheckoutProgress);
         }
 
-        /// <summary>
-        ///   Set the upstream information for the current branch.
-        /// </summary>
-        /// <param name="branch">The branch to track.</param>
-        public virtual void SetUpstreamTo(Branch branch)
-        {
-            Ensure.ArgumentNotNull(branch, "branch");
-
-            if (IsRemote)
-            {
-                throw new LibGit2SharpException("Cannot set upstream branch on a remote branch.");
-            }
-
-            string remoteName;
-            string branchName;
-
-            if (TryParseRemoteBranch(branch.CanonicalName, out remoteName, out branchName))
-            {
-                if (!remoteName.Equals(".", StringComparison.Ordinal))
-                {
-                    // Verify that remote exists.
-                    if (repo.Remotes[remoteName] == null)
-                    {
-                        throw new LibGit2SharpException(string.Format("Could not find remote '{0}' for branch '{1}'.", remoteName, branch.CanonicalName));
-                    }
-                }
-
-                repo.Config.Set<string>(string.Format("branch.{0}.remote", Name), remoteName);
-                repo.Config.Set<string>(string.Format("branch.{0}.merge", Name), string.Format("refs/heads/{0}", branchName));
-            }
-            else
-            {
-                throw new LibGit2SharpException(string.Format("Unable to parse '{0}' into a remote and branch name.", branch.CanonicalName));
-            }
-        }
-
-        /// <summary>
-        ///   Unset the upstream tracking information.
-        /// </summary>
-        public virtual void UnsetUpstream()
-        {
-            repo.Config.Unset(string.Format("branch.{0}.remote", Name));
-            repo.Config.Unset(string.Format("branch.{0}.merge", Name));
-        }
-
         private Branch ResolveTrackedBranch()
         {
             using (ReferenceSafeHandle branchPtr = repo.Refs.RetrieveReferencePtr(CanonicalName, false))
@@ -276,41 +231,6 @@ namespace LibGit2Sharp
         private static bool IsRemoteBranch(string canonicalName)
         {
             return canonicalName.StartsWith("refs/remotes/", StringComparison.Ordinal);
-        }
-
-        /// <summary>
-        ///   Try to parse a Canonical branch name
-        /// </summary>
-        /// <param name="canonicalName"></param>
-        /// <param name="remoteName"></param>
-        /// <param name="branchName"></param>
-        /// <returns></returns>
-        private static bool TryParseRemoteBranch(string canonicalName, out string remoteName, out string branchName)
-        {
-            remoteName = null;
-            branchName = null;
-
-            string localPrefix = "refs/heads/";
-            string remotePrefix = "refs/remotes/";
-
-            if (canonicalName.StartsWith(localPrefix, StringComparison.Ordinal))
-            {
-                remoteName = ".";
-                branchName = canonicalName.Substring(localPrefix.Length);
-
-                return true;
-            }
-            else if (canonicalName.StartsWith(remotePrefix, StringComparison.Ordinal))
-            {
-                int remoteNameEnd = canonicalName.IndexOf('/', remotePrefix.Length);
-
-                remoteName = canonicalName.Substring(remotePrefix.Length, remoteNameEnd - remotePrefix.Length);
-                branchName = canonicalName.Substring(remoteNameEnd);
-
-                return true;
-            }
-
-            return false;
         }
 
         /// <summary>

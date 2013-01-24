@@ -413,9 +413,8 @@ namespace LibGit2Sharp.Tests
         [Fact]
         public void CanSetUpstreamBranch()
         {
-            string testBranchName = "branchToSetUpstreamInfoFor";
-            string upstreamBranchName = "refs/remotes/origin/master";
-            string remoteName = "origin";
+            const string testBranchName = "branchToSetUpstreamInfoFor";
+            const string upstreamBranchName = "refs/remotes/origin/master";
 
             TemporaryCloneOfTestRepo path = BuildTemporaryCloneOfTestRepo(StandardTestRepoPath);
 
@@ -425,12 +424,16 @@ namespace LibGit2Sharp.Tests
                 Assert.False(branch.IsTracking);
 
                 Branch upstreamBranch = repo.Branches[upstreamBranchName];
-                branch.SetUpstreamTo(upstreamBranch);
+                repo.Branches.Update(branch,
+                    b => b.Upstream = upstreamBranchName);
+
+                // Testing the immutability of branch
+                Assert.False(branch.IsTracking);
 
                 // Get the updated branch information.
                 branch = repo.Branches[testBranchName];
 
-                Remote upstreamRemote = repo.Remotes[remoteName];
+                Remote upstreamRemote = repo.Remotes["origin"];
                 Assert.NotNull(upstreamBranch);
 
                 Assert.True(branch.IsTracking);
@@ -442,7 +445,8 @@ namespace LibGit2Sharp.Tests
         [Fact]
         public void CanSetLocalUpstreamBranch()
         {
-            string testBranchName = "branchToSetUpstreamInfoFor";
+            const string testBranchName = "branchToSetUpstreamInfoFor";
+
             TemporaryCloneOfTestRepo path = BuildTemporaryCloneOfTestRepo(StandardTestRepoPath);
 
             using (var repo = new Repository(path.RepositoryPath))
@@ -450,14 +454,8 @@ namespace LibGit2Sharp.Tests
                 Branch branch = repo.CreateBranch(testBranchName);
                 Assert.False(branch.IsTracking);
 
-                Branch upstreamBranch = repo.Branches["refs/heads/master"];
-                Remote upstreamRemote = repo.Remotes["origin"];
-                Assert.NotNull(upstreamBranch);
-
-                branch.SetUpstreamTo(upstreamBranch);
-
-                // Get the updated branch information
-                branch = repo.Branches[testBranchName];
+                repo.Branches.Update(branch,
+                    b => b.Upstream = "refs/heads/master");
 
                 // Branches that track the local remote are not currently considered to be a tracking branch.
                 // We can verify by reading the configuration directly
@@ -474,8 +472,8 @@ namespace LibGit2Sharp.Tests
         [Fact]
         public void CanUnsetUpstreamBranch()
         {
-            string testBranchName = "branchToSetUpstreamInfoFor";
-            string upstreamBranchName = "refs/remotes/origin/master";
+            const string testBranchName = "branchToSetUpstreamInfoFor";
+            const string upstreamBranchName = "refs/remotes/origin/master";
 
             TemporaryCloneOfTestRepo path = BuildTemporaryCloneOfTestRepo(StandardTestRepoPath);
             using (var repo = new Repository(path.RepositoryPath))
@@ -483,17 +481,14 @@ namespace LibGit2Sharp.Tests
                 Branch branch = repo.CreateBranch(testBranchName);
                 Assert.False(branch.IsTracking);
 
-                Branch upstreamBranch = repo.Branches[upstreamBranchName];
-                branch.SetUpstreamTo(upstreamBranch);
+                branch = repo.Branches.Update(branch,
+                    b => b.Upstream = upstreamBranchName);
 
-                // Get the updated branch information.
-                branch = repo.Branches[testBranchName];
+                // Got the updated branch from the Update() method
                 Assert.True(branch.IsTracking);
 
-                branch.UnsetUpstream();
-
-                // Get the updated branch information.
-                branch = repo.Branches[testBranchName];
+                branch = repo.Branches.Update(branch,
+                    b => b.Upstream = null);
 
                 // Verify this is no longer a tracking branch
                 Assert.False(branch.IsTracking);

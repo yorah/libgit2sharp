@@ -62,6 +62,7 @@
     <Compile Include="Branch.cs" />
     <Compile Include="BranchCollection.cs" />
     <Compile Include="BranchCollectionExtensions.cs" />
+    <Compile Include="BranchPropsUpdater.cs" />
     <Compile Include="Changes.cs" />
     <Compile Include="CheckoutCallbacks.cs" />
     <Compile Include="CheckoutOptions.cs" />
