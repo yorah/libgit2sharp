@@ -172,7 +172,15 @@ namespace LibGit2Sharp
                 }
                 else
                 {
-                    AddToIndex(relativePath);
+                    var submodule = repo.Submodules[relativePath];
+                    if (submodule != null)
+                    {
+                        submodule.Stage();
+                    }
+                    else
+                    {
+                        AddToIndex(relativePath);
+                    }
                 }
             }
 
