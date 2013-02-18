@@ -74,9 +74,9 @@ namespace LibGit2Sharp.Tests.TestHelpers
             return BuildTemporaryCloneOfTestRepo(BareTestRepoPath);
         }
 
-        protected TemporaryCloneOfTestRepo BuildTemporaryCloneOfTestRepo(string path)
+        protected TemporaryCloneOfTestRepo BuildTemporaryCloneOfTestRepo(string path, params string[] additionalPaths)
         {
-            return new TemporaryCloneOfTestRepo(this, path);
+            return new TemporaryCloneOfTestRepo(this, path, additionalPaths);
         }
 
         public void Register(string directoryPath)
