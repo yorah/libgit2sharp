@@ -63,7 +63,7 @@ namespace LibGit2Sharp.Tests
         {
             TemporaryCloneOfTestRepo path = BuildTemporaryCloneOfTestRepo(StandardTestRepoWorkingDirPath);
 
-            using (var repo = new Repository(path.DirectoryPath))
+            using (var repo = new Repository(path.RepositoryPath))
             {
                 RepositoryStatus oldStatus = repo.Index.RetrieveStatus();
                 Assert.Equal(3, oldStatus.Where(IsStaged).Count());
@@ -80,7 +80,7 @@ namespace LibGit2Sharp.Tests
         {
             TemporaryCloneOfTestRepo path = BuildTemporaryCloneOfTestRepo(StandardTestRepoWorkingDirPath);
 
-            using (var repo = new Repository(path.DirectoryPath))
+            using (var repo = new Repository(path.RepositoryPath))
             {
                 repo.Reset("be3563a");
 
@@ -99,7 +99,7 @@ namespace LibGit2Sharp.Tests
         {
             TemporaryCloneOfTestRepo path = BuildTemporaryCloneOfTestRepo(StandardTestRepoWorkingDirPath);
 
-            using (var repo = new Repository(path.DirectoryPath))
+            using (var repo = new Repository(path.RepositoryPath))
             {
                 repo.Reset(repo.Lookup<Commit>("be3563a"));
 
@@ -118,7 +118,7 @@ namespace LibGit2Sharp.Tests
         {
             TemporaryCloneOfTestRepo path = BuildTemporaryCloneOfTestRepo(StandardTestRepoWorkingDirPath);
 
-            using (var repo = new Repository(path.DirectoryPath))
+            using (var repo = new Repository(path.RepositoryPath))
             {
                 repo.Reset("5b5b025", new[]{ "new.txt" });
 
@@ -132,7 +132,7 @@ namespace LibGit2Sharp.Tests
         {
             TemporaryCloneOfTestRepo path = BuildTemporaryCloneOfTestRepo(StandardTestRepoWorkingDirPath);
 
-            using (var repo = new Repository(path.DirectoryPath))
+            using (var repo = new Repository(path.RepositoryPath))
             {
                 repo.Reset(repo.Lookup<Commit>("5b5b025"), new[] { "new.txt" });
 

@@ -185,7 +185,7 @@ namespace LibGit2Sharp.Tests
         {
             var clone = BuildTemporaryCloneOfTestRepo(StandardTestRepoWorkingDirPath);
 
-            using (var repo = new Repository(clone.DirectoryPath))
+            using (var repo = new Repository(clone.RepositoryPath))
             {
                 var names = new DirectoryInfo(repo.Info.WorkingDirectory).GetFileSystemInfos().Select(fsi => fsi.Name).ToList();
 

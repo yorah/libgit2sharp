@@ -54,7 +54,7 @@ namespace LibGit2Sharp.Tests
         {
             var scd = BuildTemporaryCloneOfTestRepo(StandardTestRepoWorkingDirPath);
 
-            using (var repo = new Repository(scd.DirectoryPath))
+            using (var repo = new Repository(scd.RepositoryPath))
             {
                 Assert.Equal(FileStatus.Unaltered, repo.Index.RetrieveStatus("1/branch_file.txt"));
             }
@@ -62,7 +62,7 @@ namespace LibGit2Sharp.Tests
             var options = new RepositoryOptions { WorkingDirectoryPath = newWorkdir };
 
             scd = BuildTemporaryCloneOfTestRepo(StandardTestRepoWorkingDirPath);
-            using (var repo = new Repository(scd.DirectoryPath, options))
+            using (var repo = new Repository(scd.RepositoryPath, options))
             {
                 Assert.Equal(FileStatus.Missing, repo.Index.RetrieveStatus("1/branch_file.txt"));
             }
@@ -73,7 +73,7 @@ namespace LibGit2Sharp.Tests
         {
             var scd = BuildTemporaryCloneOfTestRepo(StandardTestRepoWorkingDirPath);
 
-            using (var repo = new Repository(scd.DirectoryPath))
+            using (var repo = new Repository(scd.RepositoryPath))
             {
                 Assert.Equal(FileStatus.Untracked, repo.Index.RetrieveStatus("new_untracked_file.txt"));
 
@@ -87,7 +87,7 @@ namespace LibGit2Sharp.Tests
             var options = new RepositoryOptions { IndexPath = newIndex };
 
             scd = BuildTemporaryCloneOfTestRepo(StandardTestRepoWorkingDirPath);
-            using (var repo = new Repository(scd.DirectoryPath, options))
+            using (var repo = new Repository(scd.RepositoryPath, options))
             {
                 Assert.Equal(FileStatus.Added, repo.Index.RetrieveStatus("new_untracked_file.txt"));
             }
@@ -105,13 +105,13 @@ namespace LibGit2Sharp.Tests
         {
             var scd = BuildTemporaryCloneOfTestRepo(StandardTestRepoWorkingDirPath);
 
-            using (var repo = new Repository(scd.DirectoryPath))
+            using (var repo = new Repository(scd.RepositoryPath))
             {
                 Branch head = repo.Head;
 
                 Assert.Equal(FileStatus.Nonexistent, repo.Index.RetrieveStatus("zomg.txt"));
 
-                string commitSha = MeanwhileInAnotherDimensionAnEvilMastermindIsAtWork(scd.DirectoryPath);
+                string commitSha = MeanwhileInAnotherDimensionAnEvilMastermindIsAtWork(scd.RepositoryPath);
 
                 Branch newHead = repo.Head;
 

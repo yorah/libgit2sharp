@@ -29,7 +29,7 @@ namespace LibGit2Sharp.Tests
         {
             TemporaryCloneOfTestRepo scd = BuildTemporaryCloneOfTestRepo(StandardTestRepoWorkingDirPath);
 
-            using (var repo = new Repository(scd.DirectoryPath))
+            using (var repo = new Repository(scd.RepositoryPath))
             {
                 Assert.Equal(FileStatus.Nonexistent, repo.Index.RetrieveStatus("hello.txt"));
 
@@ -223,7 +223,7 @@ namespace LibGit2Sharp.Tests
         {
             TemporaryCloneOfTestRepo scd = BuildTemporaryCloneOfTestRepo(StandardTestRepoWorkingDirPath);
 
-            using (var repo = new Repository(scd.DirectoryPath))
+            using (var repo = new Repository(scd.RepositoryPath))
             {
                 Assert.Equal(FileStatus.Nonexistent, repo.Index.RetrieveStatus("hello.txt"));
                 File.AppendAllText(Path.Combine(repo.Info.WorkingDirectory, "hello.txt"), "I'm a new file\n");

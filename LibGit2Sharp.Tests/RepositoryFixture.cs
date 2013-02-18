@@ -476,7 +476,7 @@ namespace LibGit2Sharp.Tests
         public void QueryingTheRemoteForADetachedHeadBranchReturnsNull()
         {
             TemporaryCloneOfTestRepo path = BuildTemporaryCloneOfTestRepo(StandardTestRepoWorkingDirPath);
-            using (var repo = new Repository(path.DirectoryPath))
+            using (var repo = new Repository(path.RepositoryPath))
             {
                 repo.Checkout(repo.Head.Tip.Sha, CheckoutOptions.Force, null);
                 Branch trackLocal = repo.Head;

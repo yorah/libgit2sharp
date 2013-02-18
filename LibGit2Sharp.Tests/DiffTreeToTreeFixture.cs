@@ -469,7 +469,7 @@ namespace LibGit2Sharp.Tests
 
             const string file = "1/branch_file.txt";
 
-            using (var repo = new Repository(path.DirectoryPath))
+            using (var repo = new Repository(path.RepositoryPath))
             {
                 TreeEntry entry = repo.Head[file];
                 Assert.Equal(Mode.ExecutableFile, entry.Mode);
@@ -487,7 +487,7 @@ namespace LibGit2Sharp.Tests
 
             var options = BuildFakeSystemConfigFilemodeOption(scd, true);
 
-            using (var repo = new Repository(path.DirectoryPath, options))
+            using (var repo = new Repository(path.RepositoryPath, options))
             {
                 TreeChanges changes = repo.Diff.Compare(new []{ file });
 
@@ -500,7 +500,7 @@ namespace LibGit2Sharp.Tests
 
             options = BuildFakeSystemConfigFilemodeOption(scd, false);
 
-            using (var repo = new Repository(path.DirectoryPath, options))
+            using (var repo = new Repository(path.RepositoryPath, options))
             {
                 TreeChanges changes = repo.Diff.Compare(new[] { file });
 

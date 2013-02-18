@@ -757,7 +757,7 @@ namespace LibGit2Sharp.Tests
         public void DetachedHeadIsNotATrackingBranch()
         {
             TemporaryCloneOfTestRepo path = BuildTemporaryCloneOfTestRepo(StandardTestRepoWorkingDirPath);
-            using (var repo = new Repository(path.DirectoryPath))
+            using (var repo = new Repository(path.RepositoryPath))
             {
                 repo.Reset(ResetOptions.Hard);
                 repo.RemoveUntrackedFiles();
