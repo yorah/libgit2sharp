@@ -72,7 +72,7 @@ namespace LibGit2Sharp
 
         private GitObject RetrieveTreeEntryTarget()
         {
-            if (!Type.HasAny(new[]{GitObjectType.Tree, GitObjectType.Blob}))
+            if (!Type.HasAny(new[]{GitObjectType.Tree, GitObjectType.Blob, GitObjectType.Commit}))
             {
                 throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "TreeEntry target of type '{0}' are not supported.", Type));
             }
