@@ -109,27 +109,6 @@ namespace LibGit2Sharp.Tests
 
         [Theory]
         [InlineData("sm_changed_head")]
-        [InlineData("sm_changed_head/")]
-        public void CanStageChangeInSubmoduleViaSubmoduleStage(string submodulePath)
-        {
-            var path = BuildTemporarySubmoduleClone();
-
-            using (var repo = new Repository(path))
-            {
-                var submodule = repo.Submodules[submodulePath];
-
-                var statusBefore = submodule.RetrieveStatus();
-                Assert.Equal(SubmoduleStatus.WorkDirModified, statusBefore & SubmoduleStatus.WorkDirModified);
-
-                submodule.Stage();
-
-                var statusAfter = submodule.RetrieveStatus();
-                Assert.Equal(SubmoduleStatus.IndexModified, statusAfter & SubmoduleStatus.IndexModified);
-            }
-        }
-
-        [Theory]
-        [InlineData("sm_changed_head")]
         // [InlineData("sm_changed_head/")] // AmbiguousSpecificationException - Do we want to support this?
         public void CanStageChangeInSubmoduleViaIndexStage(string submodulePath)
         {

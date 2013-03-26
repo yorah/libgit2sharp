@@ -9,6 +9,17 @@ namespace LibGit2Sharp.Core
         private readonly IList<IEvaluator<T>> evaluators = new List<IEvaluator<T>>();
         private readonly object @lock = new object();
         private bool evaluated;
+        private Repository repo;
+
+        protected LazyGroup(Repository repo)
+        {
+            this.repo = repo;
+        }
+
+        protected Repository Repo
+        {
+            get { return repo; }
+        }
 
         public ILazy<TResult> AddLazy<TResult>(Func<T, TResult> func)
         {

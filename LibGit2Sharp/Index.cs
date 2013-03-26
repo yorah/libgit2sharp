@@ -175,7 +175,10 @@ namespace LibGit2Sharp
                     var submodule = repo.Submodules[relativePath];
                     if (submodule != null)
                     {
-                        submodule.Stage();
+                        using (var handle = Proxy.git_submodule_lookup(repo.Handle, submodule.Name))
+                        {
+                            Proxy.git_submodule_add_to_index(handle, true);
+                        }
                     }
                     else
                     {

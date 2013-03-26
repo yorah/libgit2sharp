@@ -2,8 +2,6 @@
 using System.Diagnostics;
 using System.Globalization;
 using LibGit2Sharp.Core;
-using LibGit2Sharp.Core.Compat;
-using LibGit2Sharp.Core.Handles;
 
 namespace LibGit2Sharp
 {
@@ -13,12 +11,21 @@ namespace LibGit2Sharp
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class Submodule : IEquatable<Submodule>
     {
+        private readonly SubmoduleLazyGroup group;
+
         private static readonly LambdaEqualityHelper<Submodule> equalityHelper =
             new LambdaEqualityHelper<Submodule>(x => x.Name, x => x.HeadCommitId);
 
-        private readonly SubmoduleSafeHandle handle;
         private readonly string name;
-        private readonly Lazy<string> lazyPath;
+        private readonly ILazy<string> lazyPath;
+        private readonly ILazy<ObjectId> lazyIndexCommitId;
+        private readonly ILazy<ObjectId> lazyHeadCommitId;
+        private readonly ILazy<ObjectId> lazyWorkdirCommitId;
+        private readonly ILazy<string> lazyUrl;
+        private readonly ILazy<bool> lazyFetchRecurseSubmodulesRule;
+        private readonly ILazy<SubmoduleIgnore> lazyIgnoreRule;
+        private readonly ILazy<SubmoduleUpdate> lazyUpdateRule;
+        private readonly ILazy<SubmoduleStatus> lazyStatus;
 
         /// <summary>
         ///   Needed for mocking purposes.
@@ -26,12 +33,21 @@ namespace LibGit2Sharp
         protected Submodule()
         { }
 
-        private Submodule(SubmoduleSafeHandle handle, string name)
+        internal Submodule(Repository repo, string name)
         {
-            this.handle = handle;
             this.name = name;
 
-            lazyPath = new Lazy<string>(() => Proxy.git_submodule_path(handle));
+            group = new SubmoduleLazyGroup(repo, name);
+            lazyPath = group.AddLazy(Proxy.git_submodule_path);
+            lazyIndexCommitId = group.AddLazy(Proxy.git_submodule_index_id);
+            lazyHeadCommitId = group.AddLazy(Proxy.git_submodule_head_id);
+            lazyWorkdirCommitId = group.AddLazy(Proxy.git_submodule_wd_id);
+            lazyUrl = group.AddLazy(Proxy.git_submodule_url);
+
+            lazyFetchRecurseSubmodulesRule = group.AddLazy(Proxy.git_submodule_fetch_recurse_submodules);
+            lazyIgnoreRule = group.AddLazy(Proxy.git_submodule_ignore);
+            lazyUpdateRule = group.AddLazy(Proxy.git_submodule_update);
+            lazyStatus = group.AddLazy(Proxy.git_submodule_status);
         }
 
         /// <summary>
@@ -47,25 +63,22 @@ namespace LibGit2Sharp
         /// <summary>
         ///   The commit ID for this submodule in the index.
         /// </summary>
-        public virtual ObjectId IndexCommitId { get { return Proxy.git_submodule_index_id(handle); } }
+        public virtual ObjectId IndexCommitId { get { return lazyIndexCommitId.Value; } }
 
         /// <summary>
         ///   The commit ID for this submodule in the current HEAD tree.
         /// </summary>
-        public virtual ObjectId HeadCommitId { get { return Proxy.git_submodule_head_id(handle); } }
+        public virtual ObjectId HeadCommitId { get { return lazyHeadCommitId.Value; } }
 
         /// <summary>
         ///   The commit ID for this submodule in the current working directory.
         /// </summary>
-        public virtual ObjectId WorkDirCommitId { get { return Proxy.git_submodule_wd_id(handle); } }
+        public virtual ObjectId WorkDirCommitId { get { return lazyWorkdirCommitId.Value; } }
 
         /// <summary>
         ///   The URL of the submodule.
         /// </summary>
-        public virtual string Url
-        {
-            get { return Proxy.git_submodule_url(handle); }
-        }
+        public virtual string Url { get { return lazyUrl.Value; } }
 
         /// <summary>
         ///   The fetchRecurseSubmodules rule for the submodule.
@@ -73,39 +86,20 @@ namespace LibGit2Sharp
         ///   Note that at this time, LibGit2Sharp does not honor this setting and the
         ///   fetch functionality current ignores submodules.
         /// </summary>
-        public virtual bool FetchRecurseSubmodules
+        public virtual bool FetchRecurseSubmodulesRule
         {
-            get { return Proxy.git_submodule_fetch_recurse_submodules(handle); }
+            get { return lazyFetchRecurseSubmodulesRule.Value; }
         }
 
         /// <summary>
         ///   The ignore rule of the submodule.
         /// </summary>
-        public virtual SubmoduleIgnore Ignore
-        {
-            get { return Proxy.git_submodule_ignore(handle); }
-        }
+        public virtual SubmoduleIgnore IgnoreRule { get { return lazyIgnoreRule.Value; } }
 
         /// <summary>
         ///   The update rule of the submodule.
         /// </summary>
-        public virtual SubmoduleUpdate Update
-        {
-            get { return Proxy.git_submodule_update(handle); }
-        }
-
-        /// <summary>
-        ///   Add current submodule HEAD commit to index of superproject.
-        /// </summary>
-        public virtual void Stage()
-        {
-            Stage(true);
-        }
-
-        internal virtual void Stage(bool writeIndex)
-        {
-            Proxy.git_submodule_add_to_index(handle, writeIndex);
-        }
+        public virtual SubmoduleUpdate UpdateRule { get { return lazyUpdateRule.Value; } }
 
         /// <summary>
         ///   Retrieves the state of this submodule in the working directory compared to the staging area and the latest commmit.
@@ -113,7 +107,8 @@ namespace LibGit2Sharp
         /// <returns></returns>
         public virtual SubmoduleStatus RetrieveStatus()
         {
-            return Proxy.git_submodule_status(handle);
+            // Should be a property? Should it be dynamic?
+            return lazyStatus.Value;
         }
 
         /// <summary>
@@ -152,11 +147,6 @@ namespace LibGit2Sharp
         public override string ToString()
         {
             return Name;
-        }
-
-        internal static Submodule BuildFromPtr(SubmoduleSafeHandle handle, string name)
-        {
-            return handle == null ? null : new Submodule(handle, name);
         }
 
         private string DebuggerDisplay

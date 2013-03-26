@@ -39,7 +39,7 @@ namespace LibGit2Sharp
             {
                 Ensure.ArgumentNotNullOrEmptyString(name, "name");
 
-                return Submodule.BuildFromPtr(repo.RegisterForCleanup(Proxy.git_submodule_lookup(repo.Handle, name)), name);
+                return new Submodule(repo, name);
             }
         }
 

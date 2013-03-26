@@ -72,6 +72,7 @@
     <Compile Include="Core\Handles\GitFetchSpecHandle.cs" />
     <Compile Include="Core\PathCase.cs" />
     <Compile Include="Core\Handles\SubmoduleSafeHandle.cs" />
+    <Compile Include="Core\SubmoduleLazyGroup.cs" />
     <Compile Include="Network.cs" />
     <Compile Include="Core\GitRemoteHead.cs" />
     <Compile Include="Stash.cs" />
