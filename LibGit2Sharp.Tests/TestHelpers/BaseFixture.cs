@@ -221,5 +221,10 @@ namespace LibGit2Sharp.Tests.TestHelpers
 
             return file;
         }
+
+        protected string GetExpectedPatch(string patchFilename)
+        {
+            return File.ReadAllText(Path.Combine(ResourcesDirectory.FullName, "expected_patches/" + patchFilename));
+        }
     }
 }

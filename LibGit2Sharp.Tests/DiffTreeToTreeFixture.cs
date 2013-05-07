@@ -323,77 +323,8 @@ namespace LibGit2Sharp.Tests
                 Assert.Equal(1, treeEntryChanges.LinesDeleted);
 
                 Assert.Equal(Mode.Nonexistent, changes["my-name-does-not-feel-right.txt"].Mode);
-
-                var expected = new StringBuilder()
-                    .Append("diff --git a/numbers.txt b/numbers.txt\n")
-                    .Append("index 7909961..4e935b7 100644\n")
-                    .Append("--- a/numbers.txt\n")
-                    .Append("+++ b/numbers.txt\n")
-                    .Append("@@ -1,4 +1,5 @@\n")
-                    .Append(" 1\n")
-                    .Append("+2\n")
-                    .Append(" 3\n")
-                    .Append(" 4\n")
-                    .Append(" 5\n")
-                    .Append("@@ -8,8 +9,9 @@\n")
-                    .Append(" 8\n")
-                    .Append(" 9\n")
-                    .Append(" 10\n")
-                    .Append("-12\n")
-                    .Append("+11\n")
-                    .Append(" 12\n")
-                    .Append(" 13\n")
-                    .Append(" 14\n")
-                    .Append(" 15\n")
-                    .Append("+16\n");
-
-                Assert.Equal(expected.ToString(), treeEntryChanges.Patch);
-
-                expected = new StringBuilder()
-                    .Append("diff --git a/my-name-does-not-feel-right.txt b/my-name-does-not-feel-right.txt\n")
-                    .Append("deleted file mode 100644\n")
-                    .Append("index e8953ab..0000000\n")
-                    .Append("--- a/my-name-does-not-feel-right.txt\n")
-                    .Append("+++ /dev/null\n")
-                    .Append("@@ -1,4 +0,0 @@\n")
-                    .Append("-That's a terrible name!\n")
-                    .Append("-I don't like it.\n")
-                    .Append("-People look down at me and laugh. :-(\n")
-                    .Append("-Really!!!!\n")
-                    .Append("diff --git a/numbers.txt b/numbers.txt\n")
-                    .Append("index 7909961..4e935b7 100644\n")
-                    .Append("--- a/numbers.txt\n")
-                    .Append("+++ b/numbers.txt\n")
-                    .Append("@@ -1,4 +1,5 @@\n")
-                    .Append(" 1\n")
-                    .Append("+2\n")
-                    .Append(" 3\n")
-                    .Append(" 4\n")
-                    .Append(" 5\n")
-                    .Append("@@ -8,8 +9,9 @@\n")
-                    .Append(" 8\n")
-                    .Append(" 9\n")
-                    .Append(" 10\n")
-                    .Append("-12\n")
-                    .Append("+11\n")
-                    .Append(" 12\n")
-                    .Append(" 13\n")
-                    .Append(" 14\n")
-                    .Append(" 15\n")
-                    .Append("+16\n")
-                    .Append("diff --git a/super-file.txt b/super-file.txt\n")
-                    .Append("new file mode 100644\n")
-                    .Append("index 0000000..16bdf1d\n")
-                    .Append("--- /dev/null\n")
-                    .Append("+++ b/super-file.txt\n")
-                    .Append("@@ -0,0 +1,5 @@\n")
-                    .Append("+That's a terrible name!\n")
-                    .Append("+I don't like it.\n")
-                    .Append("+People look down at me and laugh. :-(\n")
-                    .Append("+Really!!!!\n")
-                    .Append("+Yeah! Better!\n");
-
-                Assert.Equal(expected.ToString(), changes.Patch);
+                Assert.Equal(GetExpectedPatch("f8d44d7...7252fe2-numbers.txt.patch"), treeEntryChanges.Patch);
+                Assert.Equal(GetExpectedPatch("f8d44d7...7252fe2.patch"), changes.Patch);
             }
         }
 
