@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using LibGit2Sharp.Tests.TestHelpers;
 using Xunit;
+using Xunit.Extensions;
 
 namespace LibGit2Sharp.Tests
 {
@@ -222,23 +223,31 @@ namespace LibGit2Sharp.Tests
          * $ git diff --shortstat f8d44d7..ec9e401
          *  1 file changed, 2 insertions(+), 1 deletion(-)
          */
-        [Fact]
-        public void CanCompareTwoVersionsOfAFileWithATrailingNewlineDeletion()
+        [Theory]
+        [InlineData(0, 175)]
+        [InlineData(1, 191)]
+        [InlineData(2, 184)]
+        [InlineData(3, 187)]
+        [InlineData(4, 193)]
+        public void CanCompareTwoVersionsOfAFileWithATrailingNewlineDeletion(int contextLines, int expectedPatchLength)
         {
             using (var repo = new Repository(StandardTestRepoPath))
             {
                 Tree rootCommitTree = repo.Lookup<Commit>("f8d44d7").Tree;
                 Tree commitTreeWithUpdatedFile = repo.Lookup<Commit>("ec9e401").Tree;
 
-                TreeChanges changes = repo.Diff.Compare(rootCommitTree, commitTreeWithUpdatedFile);
+                TreeChanges changes = repo.Diff.Compare(rootCommitTree, commitTreeWithUpdatedFile,
+                                                        compareOptions: new CompareOptions { ContextLines = (short)contextLines });
 
                 Assert.Equal(1, changes.Count());
                 Assert.Equal(1, changes.Modified.Count());
+                Assert.Equal(expectedPatchLength, changes.Patch.Length);
 
                 TreeEntryChanges treeEntryChanges = changes.Modified.Single();
 
                 Assert.Equal(2, treeEntryChanges.LinesAdded);
                 Assert.Equal(1, treeEntryChanges.LinesDeleted);
+                Assert.Equal(expectedPatchLength, treeEntryChanges.Patch.Length);
             }
         }
 
@@ -479,7 +488,7 @@ namespace LibGit2Sharp.Tests
         {
             using (var repo = new Repository(StandardTestRepoPath))
             {
-                TreeChanges changes = repo.Diff.Compare(null, null, null);
+                TreeChanges changes = repo.Diff.Compare(default(Tree), default(Tree));
 
                 Assert.Equal(0, changes.Count());
             }
