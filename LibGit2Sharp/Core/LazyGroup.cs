@@ -44,7 +44,7 @@ namespace LibGit2Sharp.Core
 
         protected abstract void EvaluateInternal(Action<T> evaluator);
 
-        protected static ILazy<TResult> Singleton<TResult>(Func<TResult> resultSelector)
+        public static ILazy<TResult> Singleton<TResult>(Func<TResult> resultSelector)
         {
             return new LazyWrapper<TResult>(resultSelector);
         }

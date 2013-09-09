@@ -593,6 +593,9 @@ namespace LibGit2Sharp.Core
         internal static extern void git_odb_free(IntPtr odb);
 
         [DllImport(libgit2)]
+        internal static extern int git_odb_read_header(out UIntPtr length, out GitObjectType type, ObjectDatabaseSafeHandle odb, ref GitOid id);
+
+        [DllImport(libgit2)]
         internal static extern void git_object_free(IntPtr obj);
 
         [DllImport(libgit2)]

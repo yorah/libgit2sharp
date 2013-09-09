@@ -442,23 +442,7 @@ namespace LibGit2Sharp
         {
             Ensure.ArgumentNotNull(id, "id");
 
-            GitObjectSafeHandle obj = null;
-
-            try
-            {
-                obj = Proxy.git_object_lookup(handle, id, type);
-
-                if (obj == null)
-                {
-                    return null;
-                }
-
-                return GitObject.BuildFrom(this, id, Proxy.git_object_type(obj), knownPath);
-            }
-            finally
-            {
-                obj.SafeDispose();
-            }
+            return GitObject.BuildFrom(this, id, knownPath);
         }
 
         private static string PathFromRevparseSpec(string spec)
@@ -501,7 +485,7 @@ namespace LibGit2Sharp
                     return null;
                 }
 
-                obj = GitObject.BuildFrom(this, Proxy.git_object_id(sh), objType, PathFromRevparseSpec(objectish));
+                obj = GitObject.BuildFrom(this, Proxy.git_object_id(sh), PathFromRevparseSpec(objectish), null, objType);
             }
 
             if (lookUpOptions.HasFlag(LookUpOptions.DereferenceResultToCommit))
@@ -632,8 +616,8 @@ namespace LibGit2Sharp
                     }
                 }
 
-                obj = GitObject.BuildFrom(this, Proxy.git_object_id(objH), Proxy.git_object_type(objH),
-                                              PathFromRevparseSpec(committishOrBranchSpec));
+                obj = GitObject.BuildFrom(this, Proxy.git_object_id(objH), PathFromRevparseSpec(committishOrBranchSpec), null,
+                    Proxy.git_object_type(objH));
             }
             finally
             {

@@ -82,7 +82,7 @@ namespace LibGit2Sharp
 
                 case TreeEntryTargetType.Blob:
                 case TreeEntryTargetType.Tree:
-                    return GitObject.BuildFrom(repo, targetOid, TargetType.ToGitObjectType(), Path);
+                    return GitObject.BuildFrom(repo, targetOid, Path, null, TargetType.ToGitObjectType());
 
                 default:
                     throw new InvalidOperationException(

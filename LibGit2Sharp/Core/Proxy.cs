@@ -1064,6 +1064,29 @@ namespace LibGit2Sharp.Core
             NativeMethods.git_odb_free(odb);
         }
 
+        public static Tuple<int, GitObjectType> git_odb_read_header(ObjectDatabaseSafeHandle odb, ObjectId id)
+        {
+            GitOid oid = id.Oid;
+            UIntPtr length;
+            GitObjectType type;
+
+            using (ThreadAffinity())
+            {
+                int res = NativeMethods.git_odb_read_header(out length, out type, odb, ref oid);
+                switch (res)
+                {
+                    case (int)GitErrorCode.NotFound:
+                        return null;
+
+                    default:
+                        Ensure.ZeroResult(res);
+                        break;
+                }
+            }
+
+            return new Tuple<int, GitObjectType>((int)length, type);
+        }
+
         #endregion
 
         #region git_push_

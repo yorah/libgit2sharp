@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using LibGit2Sharp.Core;
+using LibGit2Sharp.Core.Compat;
 using LibGit2Sharp.Core.Handles;
 
 namespace LibGit2Sharp
@@ -60,7 +61,19 @@ namespace LibGit2Sharp
             get { return Id.Sha; }
         }
 
-        internal static GitObject BuildFrom(Repository repo, ObjectId id, GitObjectType type, FilePath path)
+        internal static GitObject BuildFrom(Repository repo, ObjectId id, FilePath path)
+        {
+            Tuple<int, GitObjectType> objMetadata = Proxy.git_odb_read_header(repo.ObjectDatabase.Handle, id);
+
+            if (objMetadata == null)
+            {
+                return null;
+            }
+
+            return BuildFrom(repo, id, path, objMetadata.Item1, objMetadata.Item2);
+        }
+
+        internal static GitObject BuildFrom(Repository repo, ObjectId id, FilePath path, int? size, GitObjectType type)
         {
             switch (type)
             {
@@ -71,9 +84,13 @@ namespace LibGit2Sharp
                 case GitObjectType.Tag:
                     return new TagAnnotation(repo, id);
                 case GitObjectType.Blob:
+                    if (size.HasValue)
+                        return new Blob(repo, id, size.Value);
+
                     return new Blob(repo, id);
                 default:
-                    throw new LibGit2SharpException(string.Format(CultureInfo.InvariantCulture, "Unexpected type '{0}' for object '{1}'.", type, id));
+                    throw new LibGit2SharpException(string.Format(CultureInfo.InvariantCulture, "Unexpected type '{0}' for object '{1}'.",
+                         type, id));
             }
         }
 
@@ -86,7 +103,7 @@ namespace LibGit2Sharp
                     return null;
                 }
 
-                return (Commit)BuildFrom(repo, Proxy.git_object_id(peeledHandle), GitObjectType.Commit, null);
+                return (Commit)BuildFrom(repo, Proxy.git_object_id(peeledHandle), null, null, GitObjectType.Commit);
             }
         }
 
