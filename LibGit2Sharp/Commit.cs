@@ -24,7 +24,7 @@ namespace LibGit2Sharp
         private readonly ILazy<string> lazyEncoding;
 
         private readonly ParentsCollection parents;
-        private readonly Lazy<string> lazyShortMessage;
+        private readonly ILazy<string> lazyShortMessage;
         private readonly Lazy<IEnumerable<Note>> lazyNotes;
 
         /// <summary>
@@ -43,8 +43,8 @@ namespace LibGit2Sharp
             lazyCommitter = group.AddLazy(Proxy.git_commit_committer);
             lazyMessage = group.AddLazy(Proxy.git_commit_message);
             lazyEncoding = group.AddLazy(RetrieveEncodingOf);
+            lazyShortMessage = group.AddLazy(Proxy.git_commit_summary);
 
-            lazyShortMessage = new Lazy<string>(ExtractShortMessage);
             lazyNotes = new Lazy<IEnumerable<Note>>(() => RetrieveNotesOfCommit(id).ToList());
 
             parents = new ParentsCollection(repo, id);
@@ -99,16 +99,6 @@ namespace LibGit2Sharp
         /// Gets the notes of this commit.
         /// </summary>
         public virtual IEnumerable<Note> Notes { get { return lazyNotes.Value; } }
-
-        private string ExtractShortMessage()
-        {
-            if (Message == null)
-            {
-                return string.Empty; //TODO: Add some test coverage
-            }
-
-            return Message.Split('\n')[0];
-        }
 
         private IEnumerable<Note> RetrieveNotesOfCommit(ObjectId oid)
         {

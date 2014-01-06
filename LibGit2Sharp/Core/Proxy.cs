@@ -370,6 +370,11 @@ namespace LibGit2Sharp.Core
             return (int)NativeMethods.git_commit_parentcount(obj.ObjectPtr);
         }
 
+        public static string git_commit_summary(GitObjectSafeHandle obj)
+        {
+            return NativeMethods.git_commit_summary(obj);
+        }
+
         public static ObjectId git_commit_tree_oid(GitObjectSafeHandle obj)
         {
             return NativeMethods.git_commit_tree_id(obj).MarshalAsObjectId();

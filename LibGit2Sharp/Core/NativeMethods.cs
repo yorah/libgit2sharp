@@ -272,6 +272,10 @@ namespace LibGit2Sharp.Core
         internal static extern uint git_commit_parentcount(GitObjectSafeHandle commit);
 
         [DllImport(libgit2)]
+        [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = UniqueId.UniqueIdentifier, MarshalTypeRef = typeof(LaxUtf8NoCleanupMarshaler))]
+        internal static extern string git_commit_summary(GitObjectSafeHandle commit);
+
+        [DllImport(libgit2)]
         internal static extern OidSafeHandle git_commit_tree_id(GitObjectSafeHandle commit);
 
         [DllImport(libgit2)]
